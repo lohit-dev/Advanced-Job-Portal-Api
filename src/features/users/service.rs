@@ -1,7 +1,6 @@
+use crate::features::users::repository::UserRepository;
 use async_trait::async_trait;
 use sqlx::PgPool;
-
-use crate::features::users::repository::UserRepository;
 
 pub struct UserService {
     pub db: PgPool,

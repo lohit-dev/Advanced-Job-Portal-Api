@@ -1,1 +1,23 @@
+# === Rust artifacts ===
 /target
+**/*.rs.bk
+
+# === Environment ===
+.env
+
+# === Logs ===
+*.log
+logs/
+
+# === IDEs / editors ===
+.vscode/
+.idea/
+*.swp
+*~
+
+# === OS-specific ===
+.DS_Store
+Thumbs.db
+
+# === Dependency folders (if any) ===
+/node_modules

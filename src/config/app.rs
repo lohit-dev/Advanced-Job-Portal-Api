@@ -5,6 +5,7 @@ pub struct AppConfig {
     pub jwt_secret: String,
     pub jwt_maxage: i64,
     pub port: u16,
+    // pub max_password_length: usize,
 }
 
 impl AppConfig {
@@ -19,6 +20,10 @@ impl AppConfig {
                 .unwrap_or_else(|_| "3000".to_string())
                 .parse()
                 .expect("PORT must be a number"),
+            //     max_password_length: env::var("MAX_PASSWORD_LENGTH")
+            //         .expect("MAX_PASSWORD_LENGTH is missing")
+            //         .parse()
+            //         .expect("MAX_PASSWORD_LENGTH must be a number"),
         }
     }
 }

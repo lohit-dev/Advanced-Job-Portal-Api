@@ -1,0 +1,96 @@
+# E-commerce API Curl Commands
+# Base URL: http://localhost:3000 (adjust port if different)
+
+# Authentication Endpoints
+# ----------------------
+
+# 1. Register a new user
+curl -X POST http://localhost:3000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "John Doe",
+    "email": "john@example.com",
+    "password": "password123",
+    "passwordConfirm": "password123"
+  }'
+# Expected output: {"status":"success","message":"Registration successful! Please check your email to verify your account."}
+
+# 2. Login
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "john@example.com",
+    "password": "password123"
+  }'
+# Expected output: {"status":"success","token":"<jwt_token>"}
+
+# 3. Verify Email
+curl -X GET "http://localhost:3000/api/auth/verify?token=<verification_token>"
+# Expected output: {"status":"success","token":"<jwt_token>"}
+
+# 4. Forgot Password
+curl -X POST http://localhost:3000/api/auth/forgot-password \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "john@example.com"
+  }'
+# Expected output: {"status":"success","message":"Password reset link has been sent to your email."}
+
+# 5. Reset Password
+curl -X POST http://localhost:3000/api/auth/reset-password \
+  -H "Content-Type: application/json" \
+  -d '{
+    "token": "<reset_token>",
+    "new_password": "newpassword123",
+    "new_password_confirm": "newpassword123"
+  }'
+# Expected output: {"status":"success","message":"Password has been successfully reset."}
+
+# User Endpoints
+# -------------
+
+# 6. Get All Users (Public)
+curl -X GET "http://localhost:3000/api/users?page=1&limit=10"
+# Expected output: {"status":"success","users":[...],"results":<total_count>}
+
+# 7. Get User by ID (Public)
+curl -X GET "http://localhost:3000/api/users/<user_id>"
+# Expected output: {"status":"success","data":{"user":{...}}}
+
+# 8. Get User by Email (Public)
+curl -X GET "http://localhost:3000/api/users/email/john@example.com"
+# Expected output: {"status":"success","data":{"user":{...}}}
+
+# Protected Endpoints (Requires Authentication)
+# -------------------------------------------
+
+# 9. Update User Name
+curl -X PUT "http://localhost:3000/api/users/<user_id>" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <jwt_token>" \
+  -d '{
+    "name": "John Updated"
+  }'
+# Expected output: {"status":"success","data":{"user":{...}}}
+
+# 10. Update User Role
+curl -X PUT "http://localhost:3000/api/users/<user_id>/role" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <jwt_token>" \
+  -d '{
+    "role": "Admin"
+  }'
+# Expected output: {"status":"success","data":{"user":{...}}}
+
+# 11. Delete User
+curl -X DELETE "http://localhost:3000/api/users/<user_id>" \
+  -H "Authorization: Bearer <jwt_token>"
+# Expected output: {"status":"success","message":"User <name> deleted successfully (Dummy)"}
+
+# Notes:
+# 1. Replace <user_id> with actual UUID
+# 2. Replace <jwt_token> with token received from login
+# 3. Replace <verification_token> with token received in email
+# 4. Replace <reset_token> with token received in reset password email
+# 5. All protected endpoints require a valid JWT token in the Authorization header
+# 6. The server runs on port 3000 by default, adjust if different 

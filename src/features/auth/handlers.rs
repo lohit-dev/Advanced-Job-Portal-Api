@@ -227,8 +227,9 @@ pub async fn forgot_password(
         .await
         .map_err(|e| HttpError::server_error(e.to_string()))?;
 
+    let base_url = "https://e-commerce-backend-rs.onrender.com/api/auth/verify";
     let reset_link = format!(
-        "http://localhost:5173/reset-password?token={}",
+        "https://e-commerce-backend-rs.onrender.com/api/auth/reset-password?token={}",
         verification_token
     );
     send_forgot_password_email(&user.email, &reset_link, &user.name)

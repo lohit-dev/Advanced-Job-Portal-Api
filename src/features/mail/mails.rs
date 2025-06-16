@@ -9,7 +9,7 @@ pub async fn send_verification_email(
 ) -> Result<(), Box<dyn std::error::Error>> {
     let subject = "Email Verification";
     let template_path = format!("{}/verify-mail.html", BASE_TEMPLATE_PATH);
-    let base_url = "http://localhost:8000/api/auth/verify";
+    let base_url = "https://e-commerce-backend-rs.onrender.com/api/auth/verify";
     let verification_link = create_verification_link(base_url, token);
     let placeholders = vec![
         ("{{username}}".to_string(), username.to_string()),

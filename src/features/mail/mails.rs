@@ -1,6 +1,6 @@
 use crate::features::mail::send::send_email;
 
-const BASE_TEMPLATE_PATH: &str = "src/features/mail/templates";
+const BASE_TEMPLATE_PATH: &str = "./templates";
 
 pub async fn send_verification_email(
     to_email: &str,

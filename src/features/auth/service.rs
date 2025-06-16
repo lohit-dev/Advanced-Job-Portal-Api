@@ -59,7 +59,7 @@ impl AuthRepository for AuthService {
         }
     }
 
-    fn hash(password: impl Into<String>) -> Result<String, ErrorMessage> {
+    fn hash_password(password: impl Into<String>) -> Result<String, ErrorMessage> {
         let password = password.into();
 
         if password.is_empty() {

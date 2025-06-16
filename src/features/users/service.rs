@@ -1,4 +1,3 @@
-#![allow(unused)]
 use crate::{
     features::users::{model::User, repository::UserRepository},
     utils::mappers::map_row_to_user,
@@ -176,15 +175,15 @@ impl UserRepository for UserService {
     }
 
     async fn verifed_token(&self, token: &str) -> Result<(), sqlx::Error> {
-        sqlx::query(
+        sqlx::query!(
             "UPDATE users
             SET verified = true, 
                 updated_at = Now(),
                 verification_token = NULL,
                 token_expires_at = NULL
             WHERE verification_token = $1",
+            token
         )
-        .bind(token)
         .execute(&self.db)
         .await?;
 
@@ -197,14 +196,14 @@ impl UserRepository for UserService {
         token: &str,
         token_expires_at: DateTime<Utc>,
     ) -> Result<(), sqlx::Error> {
-        sqlx::query(
+        sqlx::query!(
             "UPDATE users
             SET verification_token = $1, token_expires_at = $2, updated_at = Now()
             WHERE id = $3",
+            token,
+            token_expires_at,
+            user_id
         )
-        .bind(token)
-        .bind(token_expires_at)
-        .bind(user_id)
         .execute(&self.db)
         .await?;
 

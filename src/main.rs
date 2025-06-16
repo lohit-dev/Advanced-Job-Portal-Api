@@ -1,33 +1,49 @@
+use axum::{Extension, Router, http::Method};
 use e_commerce::{
-    config::{database::init_db, Config},
-    features::users::{model::User, repository::UserRepository, service::UserService},
+    config::Config,
+    core::state::build_state,
+    features::{auth::routes as auth_routes, users::routes as user_routes},
 };
-use sqlx::postgres::PgPoolOptions;
+use std::net::SocketAddr;
+use std::sync::Arc;
+use tokio::net::TcpListener;
+use tower_http::{
+    cors::{Any, CorsLayer},
+    trace::TraceLayer,
+};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenv::dotenv().ok();
-    // Load configuration
+
     let config = Config::load();
-    println!("Attempting to connect to database...");
+    println!("🚀 Starting server...");
 
-    // Initialize database connection with SSL
-    let pool = PgPoolOptions::new()
-        .max_connections(5)
-        .connect(&config.database.database_url)
-        .await
-        .map_err(|e| {
-            eprintln!("❌ Database connection error: {}", e);
-            e
-        })?;
+    let app_state = Arc::new(build_state(config).await);
 
-    println!("✅ Successfully connected to NeonDB!");
+    let app = Router::new()
+        .nest("/api/auth", auth_routes::routes())
+        .nest("/api/users", user_routes::routes())
+        .layer(CorsLayer::new().allow_origin(Any).allow_methods([
+            Method::GET,
+            Method::PUT,
+            Method::POST,
+            Method::DELETE,
+        ]))
+        .layer(TraceLayer::new_for_http())
+        .layer(Extension(app_state.clone()));
 
-    let user_service = UserService { db: pool };
-    match user_service
-        .get_users(1, 10).await{
-            Ok(S)=>{println!("User : {:#?}",S)}
-            Err(_) => println!("No users"),
-        }
+    // Start server
+    let addr = SocketAddr::from(([0, 0, 0, 0], app_state.config.app.port));
+    let listener = TcpListener::bind(addr).await.unwrap();
+    println!("🌐 Server listening on http://{}", addr);
+
+    axum::serve(
+        listener,
+        app.into_make_service_with_connect_info::<SocketAddr>(),
+    )
+    .await
+    .unwrap();
+
     Ok(())
 }

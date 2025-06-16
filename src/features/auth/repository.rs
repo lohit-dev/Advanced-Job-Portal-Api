@@ -8,6 +8,6 @@ pub trait AuthRepository {
     ) -> Result<String, jsonwebtoken::errors::Error>;
 
     fn decode_token<T: Into<String>>(token: T, secret: &[u8]) -> Result<String, HttpError>;
-    fn hash(password: impl Into<String>) -> Result<String, ErrorMessage>;
+    fn hash_password(password: impl Into<String>) -> Result<String, ErrorMessage>;
     fn compare(password: &str, hashed_password: &str) -> Result<bool, ErrorMessage>;
 }

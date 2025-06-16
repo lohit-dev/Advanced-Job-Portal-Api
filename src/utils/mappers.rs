@@ -1,7 +1,7 @@
 use crate::features::users::model::{User, UserRole};
-use sqlx::{postgres::PgRow, Row};
-use uuid::Uuid;
 use chrono::{DateTime, Utc};
+use sqlx::{Row, postgres::PgRow};
+use uuid::Uuid;
 
 pub fn map_row_to_user(row: &PgRow) -> User {
     User {
@@ -16,4 +16,4 @@ pub fn map_row_to_user(row: &PgRow) -> User {
         token_expires_at: row.get::<Option<DateTime<Utc>>, _>("token_expires_at"),
         role: row.get::<UserRole, _>("role"),
     }
-} 
+}

@@ -1,0 +1,19 @@
+use crate::features::users::model::{User, UserRole};
+use sqlx::{postgres::PgRow, Row};
+use uuid::Uuid;
+use chrono::{DateTime, Utc};
+
+pub fn map_row_to_user(row: &PgRow) -> User {
+    User {
+        id: row.get::<Uuid, _>("id"),
+        name: row.get::<String, _>("name"),
+        email: row.get::<String, _>("email"),
+        password: row.get::<String, _>("password"),
+        verified: row.get::<bool, _>("verified"),
+        created_at: row.get::<Option<DateTime<Utc>>, _>("created_at"),
+        updated_at: row.get::<Option<DateTime<Utc>>, _>("updated_at"),
+        verification_token: row.get::<Option<String>, _>("verification_token"),
+        token_expires_at: row.get::<Option<DateTime<Utc>>, _>("token_expires_at"),
+        role: row.get::<UserRole, _>("role"),
+    }
+} 

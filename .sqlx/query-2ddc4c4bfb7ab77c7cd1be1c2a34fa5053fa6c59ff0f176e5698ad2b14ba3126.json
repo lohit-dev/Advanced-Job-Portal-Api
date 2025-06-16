@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE users\n            SET verification_token = $1, token_expires_at = $2, updated_at = Now()\n            WHERE id = $3",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Timestamptz",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "2ddc4c4bfb7ab77c7cd1be1c2a34fa5053fa6c59ff0f176e5698ad2b14ba3126"
+}

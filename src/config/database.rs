@@ -9,17 +9,15 @@ pub struct DatabaseConfig {
 
 impl DatabaseConfig {
     pub fn from_env() -> Self {
-        Self {
-            database_url: env::var("DATABASE_URL").expect("DATABASE_URL is missing"),
-        }
+        let database_url = env::var("DATABASE_URL").expect("DATABASE_URL is missing");
+        Self { database_url }
     }
 }
 
-pub async fn init_db(database_url: &str) -> PgPool {
+pub async fn init_db(database_url: &str) -> Result<PgPool, sqlx::Error> {
     PgPoolOptions::new()
         .max_connections(5)
         .acquire_timeout(Duration::from_secs(5))
         .connect(database_url)
         .await
-        .expect("❌ Failed to connect to PostgreSQL")
 }

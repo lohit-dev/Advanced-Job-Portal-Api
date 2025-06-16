@@ -8,6 +8,6 @@ pub struct AppState {
 }
 
 pub async fn build_state(config: Config) -> AppState {
-    let db = init_db(&config.database.database_url).await;
+    let db = init_db(&config.database.database_url).await.unwrap();
     AppState { db, config }
 }

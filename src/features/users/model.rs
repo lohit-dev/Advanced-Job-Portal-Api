@@ -2,8 +2,9 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::{FromRow, Type};
 
-#[derive(Debug, Deserialize, Serialize, Clone, Copy, Type, PartialEq)]
-#[sqlx(type_name = "user_role", rename_all = "lowercase")]
+#[derive(Debug, Clone, PartialEq, Eq, sqlx::Type, serde::Serialize, serde::Deserialize)]
+#[sqlx(type_name = "user_role")]
+#[sqlx(rename_all = "PascalCase")]
 pub enum UserRole {
     Admin,
     User,
@@ -13,9 +14,32 @@ pub enum UserRole {
 impl UserRole {
     pub fn to_str(&self) -> &str {
         match self {
-            UserRole::Admin => "admin",
-            UserRole::User => "user",
-            UserRole::Guest => "guest",
+            UserRole::Admin => "Admin",
+            UserRole::User => "User",
+            UserRole::Guest => "Guest",
+        }
+    }
+}
+
+impl std::fmt::Display for UserRole {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            UserRole::Admin => write!(f, "Admin"),
+            UserRole::User => write!(f, "User"),
+            UserRole::Guest => write!(f, "Guest"),
+        }
+    }
+}
+
+impl std::str::FromStr for UserRole {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().as_str() {
+            "admin" => Ok(UserRole::Admin),
+            "user" => Ok(UserRole::User),
+            "guest" => Ok(UserRole::Guest),
+            _ => Err(format!("Invalid user role: {}", s)),
         }
     }
 }

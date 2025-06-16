@@ -1,9 +1,6 @@
-use async_trait::async_trait;
+use crate::core::error::{ErrorMessage, HttpError};
 
-use crate::core::error::HttpError;
-
-#[async_trait]
-pub trait authRepository {
+pub trait AuthRepository {
     fn create_token(
         user_id: &str,
         secret: &[u8],
@@ -11,4 +8,6 @@ pub trait authRepository {
     ) -> Result<String, jsonwebtoken::errors::Error>;
 
     fn decode_token<T: Into<String>>(token: T, secret: &[u8]) -> Result<String, HttpError>;
+    fn hash(password: impl Into<String>) -> Result<String, ErrorMessage>;
+    fn compare(password: &str, hashed_password: &str) -> Result<bool, ErrorMessage>;
 }

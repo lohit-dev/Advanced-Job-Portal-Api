@@ -1,3 +1,4 @@
+use axum::routing::get;
 use axum::{Extension, Router, http::Method};
 use e_commerce::{
     config::Config,
@@ -37,6 +38,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let app_state = Arc::new(build_state(config).await);
 
     let app = Router::new()
+        .nest("/api/health", health_routes())
         .nest("/api/auth", auth_routes::routes())
         .nest("/api/users", user_routes::routes())
         .layer(CorsLayer::new().allow_origin(Any).allow_methods([
@@ -53,6 +55,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let listener = TcpListener::bind(addr).await.unwrap();
     println!("🌐 Server listening on http://{}", addr);
 
+    let health_url = "https://e-commerce-backend-rs.onrender.com/health".to_string();
+
+    tokio::spawn(async move {
+        let client = reqwest::Client::new();
+        loop {
+            tokio::time::sleep(tokio::time::Duration::from_secs(300)).await; // 5 minutes
+            match client.get(&health_url).send().await {
+                Ok(resp) => println!("Health ping: {} ✅", resp.status()),
+                Err(err) => eprintln!("Health ping failed: {:?}", err),
+            }
+        }
+    });
+
     axum::serve(
         listener,
         app.into_make_service_with_connect_info::<SocketAddr>(),
@@ -61,4 +76,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     .unwrap();
 
     Ok(())
+}
+
+pub fn health_routes() -> Router {
+    Router::new().route("/health", get(|| async { "Ok" }))
 }

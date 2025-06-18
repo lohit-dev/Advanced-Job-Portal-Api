@@ -3,12 +3,12 @@ use lettre::{
     message::{SinglePart, header},
     transport::smtp::authentication::Credentials,
 };
-use std::{env, fs};
+use std::env;
 
 pub async fn send_email(
     to_email: &str,
     subject: &str,
-    template_path: String,
+    html_template: String,
     placeholders: &[(String, String)],
 ) -> Result<(), Box<dyn std::error::Error>> {
     let smtp_username = env::var("SMTP_USERNAME")?;
@@ -16,10 +16,10 @@ pub async fn send_email(
     let smtp_server = env::var("SMTP_HOST")?;
     let smtp_port: u16 = env::var("SMTP_PORT")?.parse()?;
 
-    let mut html_template = fs::read_to_string(template_path)?;
+    let mut html_content = html_template;
 
     for (key, value) in placeholders {
-        html_template = html_template.replace(key, value)
+        html_content = html_content.replace(key, value)
     }
 
     let email = Message::builder()
@@ -30,7 +30,7 @@ pub async fn send_email(
         .singlepart(
             SinglePart::builder()
                 .header(header::ContentType::TEXT_HTML)
-                .body(html_template),
+                .body(html_content),
         )?;
 
     let creds = Credentials::new(smtp_username.clone(), smtp_password.clone());

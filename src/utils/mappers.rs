@@ -1,4 +1,7 @@
-use crate::features::{auth::model::AuthProvider, users::model::{User, UserRole}};
+use crate::features::{
+    auth::model::AuthProvider,
+    users::model::{User, UserRole},
+};
 use chrono::{DateTime, Utc};
 use sqlx::{Row, postgres::PgRow};
 use uuid::Uuid;

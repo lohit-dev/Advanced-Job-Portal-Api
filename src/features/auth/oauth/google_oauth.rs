@@ -1,9 +1,14 @@
+use crate::{
+    config::oauth::OAuthConfig, core::errors::OAuthError, features::auth::model::GoogleUser,
+};
 use oauth2::{
-    basic::{BasicClient, BasicErrorResponseType, BasicTokenType}, AuthorizationCode, Client, CsrfToken, EmptyExtraTokenFields, EndpointNotSet, EndpointSet, PkceCodeChallenge, PkceCodeVerifier, RevocationErrorResponseType, Scope, StandardErrorResponse, StandardRevocableToken, StandardTokenIntrospectionResponse, StandardTokenResponse, TokenResponse,
+    AuthorizationCode, Client, CsrfToken, EmptyExtraTokenFields, EndpointNotSet, EndpointSet,
+    PkceCodeChallenge, PkceCodeVerifier, RevocationErrorResponseType, Scope, StandardErrorResponse,
+    StandardRevocableToken, StandardTokenIntrospectionResponse, StandardTokenResponse,
+    TokenResponse,
+    basic::{BasicClient, BasicErrorResponseType, BasicTokenType},
 };
 use reqwest::Client as HttpClient;
-
-use crate::{config::oauth::OAuthConfig, core::errors::OAuthError, features::auth::model::GoogleUser};
 
 pub struct GoogleOAuth {
     oauth_client: Client<

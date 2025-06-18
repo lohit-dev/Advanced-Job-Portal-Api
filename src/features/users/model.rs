@@ -13,7 +13,6 @@ pub enum UserRole {
     Guest,
 }
 
-
 impl UserRole {
     pub fn to_str(&self) -> &str {
         match self {

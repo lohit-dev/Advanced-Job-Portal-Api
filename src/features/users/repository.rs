@@ -1,4 +1,7 @@
-use crate::features::{auth::model::AuthProvider, users::model::{User, UserRole}};
+use crate::features::{
+    auth::model::AuthProvider,
+    users::model::{User, UserRole},
+};
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use uuid::Uuid;

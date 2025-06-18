@@ -1,15 +1,3 @@
-use std::sync::Arc;
-
-use axum::{
-    Extension, Json,
-    extract::Query,
-    http::{HeaderMap, StatusCode, header},
-    response::{Html, IntoResponse},
-};
-use axum_extra::extract::cookie::Cookie;
-use chrono::{Duration, Utc};
-use validator::Validate;
-
 use crate::{
     core::{
         errors::{ErrorMessage, HttpError},
@@ -19,6 +7,8 @@ use crate::{
     features::{
         auth::{
             dto::{ForgotPasswordRequestDto, ResetPasswordRequestDto, VerifyEmailQueryDto},
+            model::GoogleCallbackQuery,
+            oauth::google_oauth::GoogleOAuth,
             repository::AuthRepository,
             service::AuthService,
         },
@@ -29,6 +19,18 @@ use crate::{
         },
     },
 };
+use axum::{
+    Extension, Json,
+    extract::Query,
+    http::{HeaderMap, StatusCode, header},
+    response::{Html, IntoResponse, Redirect},
+};
+use axum_extra::extract::cookie::Cookie;
+use chrono::{Duration, Utc};
+use oauth2::PkceCodeVerifier;
+use std::sync::Arc;
+use uuid::Uuid;
+use validator::Validate;
 
 pub async fn register(
     Extension(app_state): Extension<Arc<AppState>>,
@@ -336,4 +338,160 @@ pub async fn reset_password(
     };
 
     Ok(Json(response))
+}
+
+pub async fn google_login(
+    Extension(app_state): Extension<Arc<AppState>>,
+) -> Result<impl IntoResponse, HttpError> {
+    let google_oauth = GoogleOAuth::new(&app_state.config.oauth);
+    let (auth_url, csrf_token, pkce_verifier) = google_oauth.generate_auth_url();
+
+    // Store CSRF token and PKCE verifier in cookies for validation later
+    let csrf_cookie = Cookie::build(("oauth_csrf", csrf_token.secret()))
+        .path("/")
+        .max_age(time::Duration::minutes(10))
+        .http_only(true)
+        .secure(true)
+        .same_site(axum_extra::extract::cookie::SameSite::Lax)
+        .build();
+
+    let pkce_cookie = Cookie::build(("oauth_pkce", pkce_verifier.secret()))
+        .path("/")
+        .max_age(time::Duration::minutes(10))
+        .http_only(true)
+        .secure(true)
+        .same_site(axum_extra::extract::cookie::SameSite::Lax)
+        .build();
+
+    let mut headers = HeaderMap::new();
+    headers.append(header::SET_COOKIE, csrf_cookie.to_string().parse().unwrap());
+    headers.append(header::SET_COOKIE, pkce_cookie.to_string().parse().unwrap());
+
+    let redirect = Redirect::temporary(&auth_url);
+    let mut response = redirect.into_response();
+    response.headers_mut().extend(headers);
+
+    Ok(response)
+}
+
+pub async fn google_callback(
+    Query(query): Query<GoogleCallbackQuery>,
+    Extension(app_state): Extension<Arc<AppState>>,
+    cookies: axum_extra::extract::CookieJar,
+) -> Result<impl IntoResponse, HttpError> {
+    // Retrieve and validate CSRF token
+    let stored_csrf = cookies
+        .get("oauth_csrf")
+        .ok_or_else(|| HttpError::bad_request("Missing CSRF token".to_string()))?
+        .value();
+
+    if stored_csrf != query.state {
+        return Err(HttpError::bad_request("Invalid CSRF token".to_string()));
+    }
+
+    // Retrieve PKCE verifier
+    let pkce_secret = cookies
+        .get("oauth_pkce")
+        .ok_or_else(|| HttpError::bad_request("Missing PKCE verifier".to_string()))?
+        .value();
+
+    let pkce_verifier = PkceCodeVerifier::new(pkce_secret.to_string());
+
+    // Exchange authorization code for user info
+    let google_oauth = GoogleOAuth::new(&app_state.config.oauth);
+    let http_client = reqwest::Client::new();
+
+    let google_user = google_oauth
+        .exchange_code(query.code, pkce_verifier, &http_client)
+        .await
+        .map_err(|e| HttpError::server_error(format!("OAuth exchange failed: {}", e)))?;
+
+    // Check if user exists in database
+    let existing_user = app_state
+        .user_service
+        .get_user(None, None, Some(&google_user.email), None)
+        .await
+        .map_err(|e| HttpError::server_error(e.to_string()))?;
+
+    let user = match existing_user {
+        Some(user) => user,
+        None => {
+            // Create new user if doesn't exist
+            let verification_token = Uuid::new_v4().to_string();
+            let token_expires_at = chrono::Utc::now() + chrono::Duration::hours(24);
+
+            // For OAuth users, we don't have a password, so use a random hash
+            let dummy_password = AuthService::hash_password(Uuid::new_v4().to_string())
+                .map_err(|e| HttpError::server_error(e.to_string()))?;
+
+            let new_user = app_state
+                .user_service
+                .save_user(
+                    google_user.name.clone(),
+                    google_user.email.clone(),
+                    dummy_password,
+                    verification_token,
+                    token_expires_at,
+                )
+                .await
+                .map_err(|e| HttpError::server_error(e.to_string()))?;
+
+            send_welcome_email(&google_user.email, &google_user.name)
+                .await
+                .map_err(|e| {
+                    HttpError::server_error(format!("Failed to send welcome email: {}", e))
+                })?;
+
+            new_user
+        }
+    };
+
+    // Generate JWT token for the user
+    let token = AuthService::create_token(
+        &user.id.to_string(),
+        app_state.config.app.jwt_secret.as_bytes(),
+        app_state.config.app.jwt_maxage,
+    )
+    .map_err(|e| HttpError::server_error(e.to_string()))?;
+
+    // Create auth cookie
+    let cookie_duration = time::Duration::minutes(app_state.config.app.jwt_maxage * 60);
+    let auth_cookie = Cookie::build(("token", token.clone()))
+        .path("/")
+        .max_age(cookie_duration)
+        .http_only(true)
+        .secure(true) // Use secure in production
+        .same_site(axum_extra::extract::cookie::SameSite::Lax)
+        .build();
+
+    // Clear OAuth temporary cookies
+    let clear_csrf = Cookie::build(("oauth_csrf", ""))
+        .path("/")
+        .max_age(time::Duration::seconds(0))
+        .build();
+
+    let clear_pkce = Cookie::build(("oauth_pkce", ""))
+        .path("/")
+        .max_age(time::Duration::seconds(0))
+        .build();
+
+    let mut headers = HeaderMap::new();
+    headers.append(header::SET_COOKIE, auth_cookie.to_string().parse().unwrap());
+    headers.append(header::SET_COOKIE, clear_csrf.to_string().parse().unwrap());
+    headers.append(header::SET_COOKIE, clear_pkce.to_string().parse().unwrap());
+
+    // Redirect to frontend success page or return JSON response
+    // let frontend_url = "http://localhost:5173/dashboard"; // Adjust as needed
+    // let redirect = Redirect::temporary(frontend_url);
+    // let mut response = redirect.into_response();
+    // response.headers_mut().extend(headers);
+
+    let response = Json(UserLoginResponseDto {
+        status: "success".to_string(),
+        token,
+    });
+    let mut response = response.into_response();
+    response.headers_mut().extend(headers);
+
+    Ok(response)
 }

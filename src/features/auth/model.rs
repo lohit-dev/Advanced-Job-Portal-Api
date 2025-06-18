@@ -17,6 +17,11 @@ pub struct GoogleUser {
     pub family_name: String,
 }
 
+#[derive(Debug, Deserialize)]
+pub struct GoogleCallbackQuery {
+    pub code: String,
+    pub state: String,
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, sqlx::Type, serde::Serialize, serde::Deserialize)]
 #[sqlx(type_name = "auth_provider")]

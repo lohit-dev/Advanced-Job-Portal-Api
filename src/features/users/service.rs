@@ -1,5 +1,8 @@
 use crate::{
-    features::{auth::model::AuthProvider, users::{model::User, repository::UserRepository}},
+    features::{
+        auth::model::AuthProvider,
+        users::{model::User, repository::UserRepository},
+    },
     utils::mappers::map_row_to_user,
 };
 use async_trait::async_trait;

@@ -130,7 +130,6 @@ impl IntoResponse for HttpError {
     }
 }
 
-
 #[derive(Debug)]
 pub enum OAuthError {
     OAuth(String),
@@ -152,4 +151,4 @@ impl From<reqwest::Error> for OAuthError {
     fn from(err: reqwest::Error) -> Self {
         OAuthError::Http(err)
     }
-} 
+}

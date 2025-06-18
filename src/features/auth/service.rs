@@ -1,5 +1,5 @@
 use crate::{
-    core::error::{ErrorMessage, HttpError},
+    core::errors::{ErrorMessage, HttpError},
     features::auth::{model::TokenClaims, repository::AuthRepository},
 };
 use argon2::{
@@ -43,7 +43,7 @@ impl AuthRepository for AuthService {
     fn decode_token<T: Into<String>>(
         token: T,
         secret: &[u8],
-    ) -> Result<String, crate::core::error::HttpError> {
+    ) -> Result<String, crate::core::errors::HttpError> {
         let decode = decode::<TokenClaims>(
             &token.into(),
             &DecodingKey::from_secret(secret),

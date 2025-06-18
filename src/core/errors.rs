@@ -6,7 +6,7 @@ use axum::{
 use serde::{Deserialize, Serialize};
 use std::{
     error::Error,
-    fmt::{self, Display},
+    fmt::{self, Display, write},
 };
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -42,6 +42,7 @@ impl fmt::Display for ErrorResponse {
         write!(f, "{}", serde_json::to_string(&self).unwrap())
     }
 }
+
 impl Display for ErrorMessage {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let msg = match self {
@@ -128,3 +129,27 @@ impl IntoResponse for HttpError {
         self.into_http_response()
     }
 }
+
+
+#[derive(Debug)]
+pub enum OAuthError {
+    OAuth(String),
+    Http(reqwest::Error),
+}
+
+impl std::fmt::Display for OAuthError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            OAuthError::OAuth(e) => write!(f, "OAuth error: {}", e),
+            OAuthError::Http(e) => write!(f, "HTTP error: {}", e),
+        }
+    }
+}
+
+impl std::error::Error for OAuthError {}
+
+impl From<reqwest::Error> for OAuthError {
+    fn from(err: reqwest::Error) -> Self {
+        OAuthError::Http(err)
+    }
+} 

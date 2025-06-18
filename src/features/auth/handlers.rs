@@ -12,7 +12,7 @@ use validator::Validate;
 
 use crate::{
     core::{
-        error::{ErrorMessage, HttpError},
+        errors::{ErrorMessage, HttpError},
         result::{Response, UserLoginResponseDto},
         state::AppState,
     },

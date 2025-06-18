@@ -1,4 +1,4 @@
-use crate::core::error::{ErrorMessage, HttpError};
+use crate::core::errors::{ErrorMessage, HttpError};
 
 pub trait AuthRepository {
     fn create_token(

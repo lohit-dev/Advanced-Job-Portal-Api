@@ -1,6 +1,6 @@
 use crate::{
     core::{
-        error::{ErrorMessage, HttpError},
+        errors::{ErrorMessage, HttpError},
         result::{RequestQueryDto, Response, UserData, UserListResponseDto, UserResponseDto},
         state::AppState,
     },

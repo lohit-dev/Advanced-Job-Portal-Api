@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     core::{
-        error::{ErrorMessage, HttpError},
+        errors::{ErrorMessage, HttpError},
         state::AppState,
     },
     features::{

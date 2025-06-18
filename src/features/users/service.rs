@@ -180,7 +180,8 @@ impl UserRepository for UserService {
             SET verified = true, 
                 updated_at = Now(),
                 verification_token = NULL,
-                token_expires_at = NULL
+                token_expires_at = NULL,
+                role = 'User'
             WHERE verification_token = $1",
             token
         )

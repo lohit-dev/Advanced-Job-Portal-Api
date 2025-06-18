@@ -1,5 +1,5 @@
 use crate::{
-    features::users::{model::User, repository::UserRepository},
+    features::{auth::model::AuthProvider, users::{model::User, repository::UserRepository}},
     utils::mappers::map_row_to_user,
 };
 use async_trait::async_trait;
@@ -95,15 +95,36 @@ impl UserRepository for UserService {
         token_expires_at: DateTime<Utc>,
     ) -> Result<User, sqlx::Error> {
         let row = sqlx::query(
-            "INSERT INTO users (name, email, password, verification_token, token_expires_at) 
-            VALUES ($1, $2, $3, $4, $5) 
-            RETURNING id, name, email, password, verified, created_at, updated_at, verification_token, token_expires_at, role"
+            "INSERT INTO users (name, email, password, verification_token, token_expires_at, provider) 
+            VALUES ($1, $2, $3, $4, $5, $6) 
+            RETURNING id, name, email, password, verified, created_at, updated_at, verification_token, token_expires_at, role, provider"
         )
         .bind(name.into())
         .bind(email.into())
         .bind(password.into())
         .bind(verification_token.into())
         .bind(token_expires_at)
+        .bind(AuthProvider::Local)
+        .fetch_one(&self.db)
+        .await?;
+
+        Ok(map_row_to_user(&row))
+    }
+
+    async fn save_oauth_user<T: Into<String> + Send>(
+        &self,
+        name: T,
+        email: T,
+        provider: AuthProvider,
+    ) -> Result<User, sqlx::Error> {
+        let row = sqlx::query(
+            "INSERT INTO users (name, email, password, verification_token, token_expires_at, provider, verified) 
+            VALUES ($1, $2, '', NULL, NULL, $3, true) 
+            RETURNING id, name, email, password, verified, created_at, updated_at, verification_token, token_expires_at, role, provider"
+        )
+        .bind(name.into())
+        .bind(email.into())
+        .bind(provider)
         .fetch_one(&self.db)
         .await?;
 

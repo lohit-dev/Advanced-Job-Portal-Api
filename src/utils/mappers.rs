@@ -1,4 +1,4 @@
-use crate::features::users::model::{User, UserRole};
+use crate::features::{auth::model::AuthProvider, users::model::{User, UserRole}};
 use chrono::{DateTime, Utc};
 use sqlx::{Row, postgres::PgRow};
 use uuid::Uuid;
@@ -15,5 +15,6 @@ pub fn map_row_to_user(row: &PgRow) -> User {
         verification_token: row.get::<Option<String>, _>("verification_token"),
         token_expires_at: row.get::<Option<DateTime<Utc>>, _>("token_expires_at"),
         role: row.get::<UserRole, _>("role"),
+        provider: row.get::<AuthProvider, _>("provider"),
     }
 }

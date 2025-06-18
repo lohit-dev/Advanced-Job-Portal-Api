@@ -12,6 +12,8 @@ pub fn public_routes() -> Router {
         .route("/verify", get(handlers::verify_email))
         .route("/forgot-password", post(handlers::forgot_password))
         .route("/reset-password", post(handlers::reset_password))
+        // .route("/google", get(handlers::google_login))
+        // .route("/google/callback", get(handlers::google_callback))
 }
 
 pub fn routes() -> Router {

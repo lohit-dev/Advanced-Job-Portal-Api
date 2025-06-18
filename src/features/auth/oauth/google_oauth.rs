@@ -2,19 +2,8 @@ use oauth2::{
     basic::{BasicClient, BasicErrorResponseType, BasicTokenType}, AuthorizationCode, Client, CsrfToken, EmptyExtraTokenFields, EndpointNotSet, EndpointSet, PkceCodeChallenge, PkceCodeVerifier, RevocationErrorResponseType, Scope, StandardErrorResponse, StandardRevocableToken, StandardTokenIntrospectionResponse, StandardTokenResponse, TokenResponse,
 };
 use reqwest::Client as HttpClient;
-use serde::{Deserialize, Serialize};
 
-use crate::{config::oauth::OAuthConfig, core::errors::OAuthError};
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct GoogleUser {
-    pub email: String,
-    pub email_verified: bool,
-    pub name: String,
-    pub picture: String,
-    pub given_name: String,
-    pub family_name: String,
-}
+use crate::{config::oauth::OAuthConfig, core::errors::OAuthError, features::auth::model::GoogleUser};
 
 pub struct GoogleOAuth {
     oauth_client: Client<

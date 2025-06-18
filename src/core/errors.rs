@@ -6,7 +6,7 @@ use axum::{
 use serde::{Deserialize, Serialize};
 use std::{
     error::Error,
-    fmt::{self, Display, write},
+    fmt::{self, Display},
 };
 
 #[derive(Debug, Serialize, Deserialize)]

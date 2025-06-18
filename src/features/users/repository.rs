@@ -1,4 +1,4 @@
-use crate::features::users::model::{User, UserRole};
+use crate::features::{auth::model::AuthProvider, users::model::{User, UserRole}};
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use uuid::Uuid;
@@ -22,6 +22,13 @@ pub trait UserRepository {
         password: T,
         verification_token: T,
         token_expires_at: DateTime<Utc>,
+    ) -> Result<User, sqlx::Error>;
+
+    async fn save_oauth_user<T: Into<String> + Send>(
+        &self,
+        name: T,
+        email: T,
+        provider: AuthProvider,
     ) -> Result<User, sqlx::Error>;
 
     async fn get_user_count(&self) -> Result<i64, sqlx::Error>;

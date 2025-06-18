@@ -2,6 +2,8 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::{FromRow, Type};
 
+use crate::features::auth::model::AuthProvider;
+
 #[derive(Debug, Clone, PartialEq, Eq, sqlx::Type, serde::Serialize, serde::Deserialize)]
 #[sqlx(type_name = "user_role")]
 #[sqlx(rename_all = "PascalCase")]
@@ -10,6 +12,7 @@ pub enum UserRole {
     User,
     Guest,
 }
+
 
 impl UserRole {
     pub fn to_str(&self) -> &str {
@@ -54,6 +57,7 @@ pub struct User {
     pub verified: bool,
     pub verification_token: Option<String>,
     pub token_expires_at: Option<DateTime<Utc>>,
+    pub provider: AuthProvider,
     #[serde(rename = "createdAt")]
     pub created_at: Option<DateTime<Utc>>,
     #[serde(rename = "updatedAt")]

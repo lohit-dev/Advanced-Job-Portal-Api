@@ -4,7 +4,7 @@ use axum::{
     Extension, Json,
     extract::Query,
     http::{HeaderMap, StatusCode, header},
-    response::IntoResponse,
+    response::{Html, IntoResponse},
 };
 use axum_extra::extract::cookie::Cookie;
 use chrono::{Duration, Utc};
@@ -193,13 +193,57 @@ pub async fn verify_email(
     // let redirect = Redirect::to(&frontend_url);
     // let mut response = redirect.into_response();
 
-    let response = Json(UserLoginResponseDto {
-        status: "success".to_string(),
-        token,
-    });
+    let html = r#"
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Email Verified</title>
+    <style>
+        body {
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px;
+        }
+        h1 {
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+        p {
+            color: #555555;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Email Verified ✅</h1>
+        <p>Your email has been successfully verified.</p>
+        <p>You can now close this window.</p>
+    </div>
+</body>
+</html>
+"#;
 
-    let mut response = response.into_response();
-    response.headers_mut().extend(headers);
+    // let response = Json(UserLoginResponseDto {
+    //     status: "success".to_string(),
+    //     token,
+    // });
+
+    let mut response = Html(html).into_response();
+    response.headers_mut().extend(headers); // still set cookie
 
     Ok(response)
 }

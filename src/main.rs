@@ -2,7 +2,10 @@ use axum::{Extension, Router, http::Method};
 use e_commerce::{
     config::Config,
     core::state::build_state,
-    features::{auth::routes as auth_routes, users::routes as user_routes},
+    features::{
+        auth::routes as auth_routes, mail::mails::get_base_template_path,
+        users::routes as user_routes,
+    },
 };
 use std::net::SocketAddr;
 use std::sync::Arc;
@@ -27,6 +30,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let config = Config::load();
     println!("🚀 Starting server...");
+
+    let base_path = get_base_template_path().expect("Unable to get the base path");
+    println!("The base path is {:?}", base_path);
 
     let app_state = Arc::new(build_state(config).await);
 

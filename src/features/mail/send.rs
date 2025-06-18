@@ -3,7 +3,7 @@ use lettre::{
     message::{SinglePart, header},
     transport::smtp::authentication::Credentials,
 };
-use std::{env, fs, path::Path};
+use std::{env, fs};
 
 pub async fn send_email(
     to_email: &str,
@@ -15,17 +15,6 @@ pub async fn send_email(
     let smtp_password = env::var("SMTP_PASSWORD")?;
     let smtp_server = env::var("SMTP_HOST")?;
     let smtp_port: u16 = env::var("SMTP_PORT")?.parse()?;
-
-    // Get the executable's directory
-    let exe_path = env::current_exe()?;
-    let exe_dir = exe_path.parent().unwrap();
-    
-    // Construct the template path relative to the executable
-    let template_path = if template_path.starts_with("./") {
-        exe_dir.join(&template_path[2..])
-    } else {
-        exe_dir.join(template_path)
-    };
 
     let mut html_template = fs::read_to_string(template_path)?;
 

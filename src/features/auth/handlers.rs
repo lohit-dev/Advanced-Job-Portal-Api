@@ -7,7 +7,7 @@ use crate::{
     features::{
         auth::{
             dto::{ForgotPasswordRequestDto, ResetPasswordRequestDto, VerifyEmailQueryDto},
-            model::GoogleCallbackQuery,
+            model::{AuthProvider, GoogleCallbackQuery},
             oauth::google_oauth::GoogleOAuth,
             repository::AuthRepository,
             service::AuthService,
@@ -416,22 +416,12 @@ pub async fn google_callback(
     let user = match existing_user {
         Some(user) => user,
         None => {
-            // Create new user if doesn't exist
-            let verification_token = Uuid::new_v4().to_string();
-            let token_expires_at = chrono::Utc::now() + chrono::Duration::hours(24);
-
-            // For OAuth users, we don't have a password, so use a random hash
-            let dummy_password = AuthService::hash_password(Uuid::new_v4().to_string())
-                .map_err(|e| HttpError::server_error(e.to_string()))?;
-
             let new_user = app_state
                 .user_service
-                .save_user(
+                .save_oauth_user(
                     google_user.name.clone(),
                     google_user.email.clone(),
-                    dummy_password,
-                    verification_token,
-                    token_expires_at,
+                    AuthProvider::Google,
                 )
                 .await
                 .map_err(|e| HttpError::server_error(e.to_string()))?;

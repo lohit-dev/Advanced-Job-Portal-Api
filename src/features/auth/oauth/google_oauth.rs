@@ -65,16 +65,17 @@ impl GoogleOAuth {
             .map_err(|e| OAuthError::OAuth(e.to_string()))?;
 
         // Use the access token to get the user info from Google
-        let user_info: GoogleUser = http_client
+        let resp = http_client
             .get("https://www.googleapis.com/oauth2/v3/userinfo")
             .bearer_auth(token.access_token().secret())
             .send()
             .await
-            .map_err(OAuthError::Http)?
-            .json()
-            .await
             .map_err(OAuthError::Http)?;
 
+        let text = resp.text().await.map_err(OAuthError::Http)?;
+        println!("Google userinfo response: {}", text);
+        let user_info: GoogleUser = serde_json::from_str(&text).map_err(|e| OAuthError::OAuth(e.to_string()))?;
+        
         Ok(user_info)
     }
 }

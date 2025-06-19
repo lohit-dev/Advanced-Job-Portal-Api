@@ -12,9 +12,9 @@ pub struct GoogleUser {
     pub email: String,
     pub email_verified: bool,
     pub name: String,
-    pub picture: String,
-    pub given_name: String,
-    pub family_name: String,
+    pub picture: Option<String>,
+    pub given_name: Option<String>,
+    pub family_name: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]

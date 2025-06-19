@@ -55,7 +55,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let listener = TcpListener::bind(addr).await.unwrap();
     println!("🌐 Server listening on http://{}", addr);
 
-    let health_url = "https://e-commerce-backend-rs.onrender.com/health".to_string();
+    let health_url = "https://e-commerce-backend-rs.onrender.com/api/health".to_string();
 
     tokio::spawn(async move {
         let client = reqwest::Client::new();

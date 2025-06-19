@@ -29,7 +29,6 @@ use axum_extra::extract::cookie::Cookie;
 use chrono::{Duration, Utc};
 use oauth2::PkceCodeVerifier;
 use std::sync::Arc;
-use uuid::Uuid;
 use validator::Validate;
 
 pub async fn register(

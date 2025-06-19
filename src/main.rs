@@ -38,7 +38,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let app_state = Arc::new(build_state(config).await);
 
     let app = Router::new()
-        .nest("/api/health", health_routes())
+        .nest("/api/", health_routes())
         .nest("/api/auth", auth_routes::routes())
         .nest("/api/users", user_routes::routes())
         .layer(CorsLayer::new().allow_origin(Any).allow_methods([

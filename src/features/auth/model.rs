@@ -23,6 +23,15 @@ pub struct GoogleCallbackQuery {
     pub state: String,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct GithubUser {
+    pub login: String,
+    pub id: u64,
+    pub avatar_url: Option<String>,
+    pub email: Option<String>,
+    pub name: Option<String>,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, sqlx::Type, serde::Serialize, serde::Deserialize)]
 #[sqlx(type_name = "auth_provider")]
 #[sqlx(rename_all = "PascalCase")]

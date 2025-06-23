@@ -8,7 +8,7 @@ pub mod database;
 pub mod email;
 pub mod oauth;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Config {
     pub app: AppConfig,
     pub database: DatabaseConfig,

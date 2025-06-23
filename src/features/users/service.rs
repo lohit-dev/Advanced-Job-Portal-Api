@@ -10,6 +10,7 @@ use chrono::{DateTime, Utc};
 use sqlx::{PgPool, Row};
 use uuid::Uuid;
 
+#[derive(Clone)]
 pub struct UserService {
     pub db: PgPool,
 }

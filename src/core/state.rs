@@ -5,6 +5,7 @@ use crate::{
     features::{auth::service::AuthService, users::service::UserService},
 };
 
+#[derive(Clone)]
 pub struct AppState {
     pub db: PgPool,
     pub config: Config,

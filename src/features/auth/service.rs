@@ -10,6 +10,7 @@ use axum::http::StatusCode;
 use chrono::{Duration, Utc};
 use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey, Header, Validation, decode, encode};
 
+#[derive(Clone)]
 pub struct AuthService;
 
 const MAX_PASSWORD_LENGTH: usize = 64;

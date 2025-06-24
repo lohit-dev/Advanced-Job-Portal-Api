@@ -551,10 +551,17 @@ pub async fn github_callback(
         .await
         .map_err(|e| HttpError::server_error(format!("OAuth exchange failed: {}", e)))?;
 
+    // Ensure we have an email from GitHub
+    let email = github_user
+        .email
+        .ok_or_else(|| HttpError::bad_request("GitHub account has no public email".to_string()))?;
+
+    let name = github_user.login.to_string();
+
     // Check if user exists in database
     let existing_user = app_state
         .user_service
-        .get_user(None, None, Some(&github_user.email), None)
+        .get_user(None, None, Some(&email), None)
         .await
         .map_err(|e| HttpError::server_error(e.to_string()))?;
 
@@ -564,14 +571,14 @@ pub async fn github_callback(
             let new_user = app_state
                 .user_service
                 .save_oauth_user(
-                    github_user.name.clone(),
-                    github_user.email.clone(),
-                    AuthProvider::Google,
+                    name.clone(),
+                    email.clone(),
+                    AuthProvider::Github,
                 )
                 .await
                 .map_err(|e| HttpError::server_error(e.to_string()))?;
 
-            send_welcome_email(&github_user.email, &github_user.name)
+            send_welcome_email(&email, &name)
                 .await
                 .map_err(|e| {
                     HttpError::server_error(format!("Failed to send welcome email: {}", e))

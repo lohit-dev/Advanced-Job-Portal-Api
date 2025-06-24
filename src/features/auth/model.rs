@@ -22,8 +22,8 @@ pub struct GithubUser {
     pub login: String,
     pub id: u64,
     pub avatar_url: Option<String>,
-    pub email: String,
-    pub name: String,
+    pub email: Option<String>,
+    pub name: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -44,6 +44,7 @@ pub struct GithubCallbackQuery {
 pub enum AuthProvider {
     Local,
     Google,
+    Github,
 }
 
 impl AuthProvider {
@@ -51,6 +52,7 @@ impl AuthProvider {
         match self {
             AuthProvider::Local => "Local",
             AuthProvider::Google => "Google",
+            AuthProvider::Github => "Github",
         }
     }
 }
@@ -60,6 +62,7 @@ impl std::fmt::Display for AuthProvider {
         match self {
             AuthProvider::Local => write!(f, "Local"),
             AuthProvider::Google => write!(f, "Google"),
+            AuthProvider::Github => write!(f, "Github"),
         }
     }
 }
@@ -71,6 +74,7 @@ impl std::str::FromStr for AuthProvider {
         match s.to_lowercase().as_str() {
             "local" => Ok(AuthProvider::Local),
             "google" => Ok(AuthProvider::Google),
+            "github" => Ok(AuthProvider::Github),
             _ => Err(format!("Invalid auth provider: {}", s)),
         }
     }

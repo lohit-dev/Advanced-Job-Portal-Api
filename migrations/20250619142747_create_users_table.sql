@@ -6,7 +6,7 @@ DROP TYPE IF EXISTS auth_provider CASCADE;
 
 -- Recreate with correct enum values
 CREATE TYPE user_role AS ENUM ('Admin', 'User', 'Guest');
-CREATE TYPE auth_provider AS ENUM ('Local', 'Google');
+CREATE TYPE auth_provider AS ENUM ('Local', 'Google', 'Github');
 
 -- Create the users table
 CREATE TABLE users (

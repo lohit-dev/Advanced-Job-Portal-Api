@@ -17,19 +17,25 @@ pub struct GoogleUser {
     pub family_name: Option<String>,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct GithubUser {
+    pub login: String,
+    pub id: u64,
+    pub avatar_url: Option<String>,
+    pub email: String,
+    pub name: String,
+}
+
 #[derive(Debug, Deserialize)]
 pub struct GoogleCallbackQuery {
     pub code: String,
     pub state: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct GithubUser {
-    pub login: String,
-    pub id: u64,
-    pub avatar_url: Option<String>,
-    pub email: Option<String>,
-    pub name: Option<String>,
+#[derive(Debug, Deserialize)]
+pub struct GithubCallbackQuery {
+    pub code: String,
+    pub state: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, sqlx::Type, serde::Serialize, serde::Deserialize)]

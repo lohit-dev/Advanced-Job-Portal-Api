@@ -1,10 +1,9 @@
 -- Add migration script here
--- Drop existing table and types (if they exist)
+-- -- Drop existing table and types (if they exist)
 DROP TABLE IF EXISTS users CASCADE;
 DROP TYPE IF EXISTS user_role CASCADE;
 DROP TYPE IF EXISTS auth_provider CASCADE;
 
--- Recreate with correct enum values
 CREATE TYPE user_role AS ENUM ('Admin', 'User', 'Guest');
 CREATE TYPE auth_provider AS ENUM ('Local', 'Google', 'Github');
 

@@ -42,8 +42,8 @@ impl GithubOAuth {
         let (auth_url, csrf_token) = self
             .oauth_client
             .authorize_url(CsrfToken::new_random)
-            .add_scope(Scope::new("email".to_string()))
-            .add_scope(Scope::new("profile".to_string()))
+            .add_scope(Scope::new("user:email".to_string()))
+            .add_scope(Scope::new("read:user".to_string()))
             .set_pkce_challenge(pkce_challenge)
             .url();
 

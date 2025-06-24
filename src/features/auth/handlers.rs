@@ -556,7 +556,7 @@ pub async fn github_callback(
         .email
         .ok_or_else(|| HttpError::bad_request("GitHub account has no public email".to_string()))?;
 
-    let name = github_user.login.to_string();
+    let name = github_user.name.unwrap_or(github_user.login);
 
     // Check if user exists in database
     let existing_user = app_state

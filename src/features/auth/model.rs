@@ -17,6 +17,14 @@ pub struct GoogleUser {
     pub family_name: Option<String>,
 }
 
+#[derive(Debug, Deserialize)]
+pub struct GithubEmail {
+pub     email: String,
+pub     primary: bool,
+pub     verified: bool,
+pub     visibility: Option<String>,
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GithubUser {
     pub login: String,

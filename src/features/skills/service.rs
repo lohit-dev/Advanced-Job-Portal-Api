@@ -58,7 +58,7 @@ impl SkillRepository for SkillService {
             if let Some(row) = row {
                 skill = Some(map_row_to_skill(&row));
             }
-        } else if let name = skill_name {
+        } else if let Some(name) = skill_name {
             let row = sqlx::query("SELECT * FROM skills where name = $1")
                 .bind(name)
                 .fetch_optional(&self.db)

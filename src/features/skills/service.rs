@@ -144,7 +144,7 @@ impl SkillRepository for SkillService {
         .fetch_all(&self.db)
         .await?;
 
-        let users = rows.iter().map(|row| map_row_to_user(row)).collect();
+        let users = rows.iter().map(map_row_to_user).collect();
 
         Ok(users)
     }

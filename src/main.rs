@@ -58,6 +58,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let health_url = "https://https://advanced-job-portal-api.onrender.com/api/health".to_string();
 
+    // Just for render to keep this alive
     tokio::spawn(async move {
         let client = reqwest::Client::new();
         loop {

@@ -7,7 +7,7 @@ use crate::{
     features::skills::{
         dto::{
             AddUserSkillDto, CreateSkillDto, RemoveUserSkillDto, SkillListResponseDto,
-            SkillResponseDto, UpdateSkillDto,
+            SkillResponseDto, UpdateSkillDto, UsersOfSkillResponseDto,
         },
         repository::SkillRepository,
     },
@@ -151,6 +151,7 @@ pub async fn delete_skill(
 }
 
 pub async fn add_skill_to_user(
+    Path(user_id): Path<Uuid>,
     Extension(app_state): Extension<Arc<AppState>>,
     Json(body): Json<AddUserSkillDto>,
 ) -> Result<impl IntoResponse, HttpError> {
@@ -158,7 +159,7 @@ pub async fn add_skill_to_user(
         .map_err(|e| HttpError::bad_request(e.to_string()))?;
     app_state
         .skill_service
-        .add_skill_to_user(body.user_id, body.skill_id)
+        .add_skill_to_user(user_id, body.skill_id)
         .await
         .map_err(|e| HttpError::server_error(e.to_string()))?;
     let response = Response {
@@ -169,6 +170,7 @@ pub async fn add_skill_to_user(
 }
 
 pub async fn remove_skill_from_user(
+    Path(user_id): Path<Uuid>,
     Extension(app_state): Extension<Arc<AppState>>,
     Json(body): Json<RemoveUserSkillDto>,
 ) -> Result<impl IntoResponse, HttpError> {
@@ -176,7 +178,7 @@ pub async fn remove_skill_from_user(
         .map_err(|e| HttpError::bad_request(e.to_string()))?;
     app_state
         .skill_service
-        .remove_skill_from_user(body.user_id, body.skill_id)
+        .remove_skill_from_user(user_id, body.skill_id)
         .await
         .map_err(|e| HttpError::server_error(e.to_string()))?;
     let response = Response {
@@ -205,6 +207,30 @@ pub async fn get_skills_of_user(
                 name: s.name,
             })
             .collect(),
+    };
+    Ok(Json(response))
+}
+
+pub async fn get_users_of_skill(
+    Query(params): Query<HashMap<String, String>>,
+    Extension(app_state): Extension<Arc<AppState>>,
+) -> Result<impl IntoResponse, HttpError> {
+    let skill_id = params
+        .get("skill_id")
+        .ok_or_else(|| HttpError::bad_request("Missing 'skill_id' query parameter".to_string()))?;
+    let skill_id = uuid::Uuid::parse_str(skill_id)
+        .map_err(|_| HttpError::bad_request("Invalid 'skill_id' format".to_string()))?;
+
+    let users = app_state
+        .skill_service
+        .get_users_of_skill(skill_id)
+        .await
+        .map_err(|e| HttpError::server_error(e.to_string()))?;
+
+    let response = UsersOfSkillResponseDto {
+        status: "success".to_string(),
+        results: users.len(),
+        users,
     };
     Ok(Json(response))
 }

@@ -1,6 +1,9 @@
 use crate::{
-    features::skills::{model::Skill, repository::SkillRepository},
-    utils::mappers::map_row_to_skill,
+    features::{
+        skills::{model::Skill, repository::SkillRepository},
+        users::model::User,
+    },
+    utils::mappers::{map_row_to_skill, map_row_to_user},
 };
 use async_trait::async_trait;
 use sqlx::PgPool;
@@ -129,5 +132,20 @@ impl SkillRepository for SkillService {
         .fetch_all(&self.db)
         .await?;
         Ok(rows.iter().map(map_row_to_skill).collect())
+    }
+
+    async fn get_users_of_skill(&self, skill_id: Uuid) -> Result<Vec<User>, sqlx::Error> {
+        let rows = sqlx::query(
+            "SELECT * FROM users u \
+             INNER JOIN user_skills us ON u.id = us.user_id \
+             WHERE us.skill_id = $1",
+        )
+        .bind(skill_id)
+        .fetch_all(&self.db)
+        .await?;
+
+        let users = rows.iter().map(|row| map_row_to_user(row)).collect();
+
+        Ok(users)
     }
 }

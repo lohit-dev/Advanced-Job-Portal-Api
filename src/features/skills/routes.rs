@@ -15,9 +15,13 @@ pub fn protected_routes() -> Router {
     Router::new()
         .route("/{skill_id}", put(handlers::update_skill))
         .route("/{skill_id}", delete(handlers::delete_skill))
-        .route("/user/add-skill", post(handlers::add_skill_to_user))
-        .route("/user/remove-skill", post(handlers::remove_skill_from_user))
-        .route("/user/{user_id}/skills", get(handlers::get_skills_of_user))
+        .route("/user/{user_id}/add", post(handlers::add_skill_to_user))
+        .route(
+            "/user/{user_id}/remove",
+            post(handlers::remove_skill_from_user),
+        )
+        .route("/user/{user_id}", get(handlers::get_skills_of_user))
+        .route("/users/find", get(handlers::get_users_of_skill))
         .route_layer(middleware::from_fn(auth))
 }
 

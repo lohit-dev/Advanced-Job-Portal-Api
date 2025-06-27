@@ -1,5 +1,8 @@
 use serde::{Deserialize, Serialize};
+use sqlx::prelude::Type;
 use validator::Validate;
+
+use crate::features::users::model::User;
 
 #[derive(Debug, Serialize, Deserialize, Validate)]
 pub struct CreateSkillDto {
@@ -14,7 +17,7 @@ pub struct UpdateSkillDto {
     pub name: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Type, Clone)]
 pub struct SkillResponseDto {
     pub id: String,
     pub name: String,
@@ -29,12 +32,17 @@ pub struct SkillListResponseDto {
 
 #[derive(Debug, Serialize, Deserialize, Validate)]
 pub struct AddUserSkillDto {
-    pub user_id: uuid::Uuid,
     pub skill_id: uuid::Uuid,
 }
 
 #[derive(Debug, Serialize, Deserialize, Validate)]
 pub struct RemoveUserSkillDto {
-    pub user_id: uuid::Uuid,
     pub skill_id: uuid::Uuid,
+}
+
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct UsersOfSkillResponseDto {
+    pub status: String,
+    pub users: Vec<User>,
+    pub results: usize,
 }

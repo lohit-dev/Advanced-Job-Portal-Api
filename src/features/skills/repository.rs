@@ -1,4 +1,4 @@
-use crate::features::skills::model::Skill;
+use crate::features::{skills::model::Skill, users::model::User};
 use async_trait::async_trait;
 use uuid::Uuid;
 
@@ -27,4 +27,5 @@ pub trait SkillRepository {
         skill_id: Uuid,
     ) -> Result<(), sqlx::Error>;
     async fn get_skills_of_user(&self, user_id: Uuid) -> Result<Vec<Skill>, sqlx::Error>;
+    async fn get_users_of_skill(&self, skill_id: Uuid) -> Result<Vec<User>, sqlx::Error>;
 }

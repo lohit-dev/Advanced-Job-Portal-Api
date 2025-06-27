@@ -59,7 +59,7 @@ impl SkillRepository for SkillService {
                 skill = Some(map_row_to_skill(&row));
             }
         } else if let Some(name) = skill_name {
-            let row = sqlx::query("SELECT * FROM skills where name = $1")
+            let row = sqlx::query("SELECT * FROM skills where LOWER(name) = LOWER($1)")
                 .bind(name)
                 .fetch_optional(&self.db)
                 .await?;

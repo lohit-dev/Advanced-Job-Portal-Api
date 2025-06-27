@@ -5,7 +5,7 @@ use e_commerce::{
     core::state::build_state,
     features::{
         auth::routes as auth_routes, mail::mails::get_base_template_path,
-        users::routes as user_routes, skills::routes as skill_routes,
+        skills::routes as skill_routes, users::routes as user_routes,
     },
 };
 use std::net::SocketAddr;
@@ -56,7 +56,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let listener = TcpListener::bind(addr).await.unwrap();
     println!("🌐 Server listening on http://{}", addr);
 
-    let health_url = "https://e-commerce-backend-rs.onrender.com/api/health".to_string();
+    let health_url = "https://https://advanced-job-portal-api.onrender.com/api/health".to_string();
 
     tokio::spawn(async move {
         let client = reqwest::Client::new();

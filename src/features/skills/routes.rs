@@ -6,9 +6,9 @@ use axum::{
 
 pub fn public_routes() -> Router {
     Router::new()
-        .route("/", get(handlers::get_skills))
+        .route("/", get(handlers::get_skills).post(handlers::create_skill))
         .route("/{skill_id}", get(handlers::get_skill))
-        .route("/find/{name}", get(handlers::get_skill_by_name))
+        .route("/find", get(handlers::get_skill_by_name))
 }
 
 pub fn protected_routes() -> Router {

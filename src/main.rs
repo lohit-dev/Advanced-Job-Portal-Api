@@ -56,7 +56,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let listener = TcpListener::bind(addr).await.unwrap();
     println!("🌐 Server listening on http://{}", addr);
 
-    let health_url = "https://https://advanced-job-portal-api.onrender.com/api/health".to_string();
+    let health_url = "https://advanced-job-portal-api.onrender.com/api/health".to_string();
 
     // Just for render to keep this alive
     tokio::spawn(async move {

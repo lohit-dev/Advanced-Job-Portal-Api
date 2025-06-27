@@ -32,7 +32,7 @@ impl SkillRepository for SkillService {
     ) -> Result<Vec<super::model::Skill>, sqlx::Error> {
         let offset = (page - 1) * limit as u32;
         let rows = sqlx::query("SELECT * FROM skills ORDER BY name DESC LIMIT $1 OFFSET $2")
-            .bind(page as i64)
+            .bind(limit as i64)
             .bind(offset as i64)
             .fetch_all(&self.db)
             .await?;

@@ -1,6 +1,7 @@
 -- Add migration script here
 
 -- -- Drop existing table and types (if they exist)
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 DROP TABLE IF EXISTS users CASCADE;
 DROP TYPE IF EXISTS user_role CASCADE;
 DROP TYPE IF EXISTS auth_provider CASCADE;

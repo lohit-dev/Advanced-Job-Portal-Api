@@ -28,4 +28,5 @@ pub trait SkillRepository {
     ) -> Result<(), sqlx::Error>;
     async fn get_skills_of_user(&self, user_id: Uuid) -> Result<Vec<Skill>, sqlx::Error>;
     async fn get_users_of_skill(&self, skill_id: Uuid) -> Result<Vec<User>, sqlx::Error>;
+    async fn get_skill_count(&self) -> Result<i64, sqlx::Error>;
 }

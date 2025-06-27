@@ -28,6 +28,7 @@ pub struct SkillListResponseDto {
     pub status: String,
     pub skills: Vec<SkillResponseDto>,
     pub results: usize,
+    pub has_next_page: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize, Validate)]

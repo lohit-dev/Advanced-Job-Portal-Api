@@ -25,6 +25,7 @@ pub struct UserListResponseDto {
     pub status: String,
     pub users: Vec<FilterUserDto>,
     pub results: i64,
+    pub has_next_page: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

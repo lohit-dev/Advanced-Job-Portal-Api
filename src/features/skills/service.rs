@@ -6,7 +6,7 @@ use crate::{
     utils::mappers::{map_row_to_skill, map_row_to_user},
 };
 use async_trait::async_trait;
-use sqlx::PgPool;
+use sqlx::{PgPool, Row};
 use uuid::Uuid;
 
 #[derive(Clone)]
@@ -147,5 +147,12 @@ impl SkillRepository for SkillService {
         let users = rows.iter().map(|row| map_row_to_user(row)).collect();
 
         Ok(users)
+    }
+
+    async fn get_skill_count(&self) -> Result<i64, sqlx::Error> {
+        let row = sqlx::query("SELECT COUNT(*) as count FROM skills")
+            .fetch_one(&self.db)
+            .await?;
+        Ok(row.get::<i64, _>("count"))
     }
 }

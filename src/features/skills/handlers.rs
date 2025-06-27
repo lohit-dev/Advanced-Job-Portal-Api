@@ -39,6 +39,14 @@ pub async fn get_skills(
         .await
         .map_err(|e| HttpError::server_error(e.to_string()))?;
 
+    let skill_count = app_state
+        .skill_service
+        .get_skill_count()
+        .await
+        .map_err(|e| HttpError::server_error(e.to_string()))?;
+
+    let has_next_page = (page as i64 * limit as i64) < skill_count;
+
     let response = SkillListResponseDto {
         status: "success".to_string(),
         results: skills.len(),
@@ -49,6 +57,7 @@ pub async fn get_skills(
                 name: s.name,
             })
             .collect(),
+        has_next_page,
     };
     Ok(Json(response))
 }
@@ -207,6 +216,7 @@ pub async fn get_skills_of_user(
                 name: s.name,
             })
             .collect(),
+        has_next_page: false,
     };
     Ok(Json(response))
 }

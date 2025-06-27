@@ -64,10 +64,13 @@ pub async fn get_users(
         users_with_skills.push(FilterUserDto::filter_user_with_skills(user, skills_dto));
     }
 
+    let has_next_page = (page as i64 * limit as i64) < user_count;
+
     let response = UserListResponseDto {
         status: "success".to_string(),
         users: users_with_skills,
         results: user_count,
+        has_next_page,
     };
 
     Ok(Json(response))

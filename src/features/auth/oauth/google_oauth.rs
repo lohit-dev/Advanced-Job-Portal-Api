@@ -74,8 +74,9 @@ impl GoogleOAuth {
 
         let text = resp.text().await.map_err(OAuthError::Http)?;
         println!("Google userinfo response: {}", text);
-        let user_info: GoogleUser = serde_json::from_str(&text).map_err(|e| OAuthError::OAuth(e.to_string()))?;
-        
+        let user_info: GoogleUser =
+            serde_json::from_str(&text).map_err(|e| OAuthError::OAuth(e.to_string()))?;
+
         Ok(user_info)
     }
 }

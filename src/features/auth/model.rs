@@ -19,10 +19,10 @@ pub struct GoogleUser {
 
 #[derive(Debug, Deserialize)]
 pub struct GithubEmail {
-pub     email: String,
-pub     primary: bool,
-pub     verified: bool,
-pub     visibility: Option<String>,
+    pub email: String,
+    pub primary: bool,
+    pub verified: bool,
+    pub visibility: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

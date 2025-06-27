@@ -570,19 +570,13 @@ pub async fn github_callback(
         None => {
             let new_user = app_state
                 .user_service
-                .save_oauth_user(
-                    name.clone(),
-                    email.clone(),
-                    AuthProvider::Github,
-                )
+                .save_oauth_user(name.clone(), email.clone(), AuthProvider::Github)
                 .await
                 .map_err(|e| HttpError::server_error(e.to_string()))?;
 
-            send_welcome_email(&email, &name)
-                .await
-                .map_err(|e| {
-                    HttpError::server_error(format!("Failed to send welcome email: {}", e))
-                })?;
+            send_welcome_email(&email, &name).await.map_err(|e| {
+                HttpError::server_error(format!("Failed to send welcome email: {}", e))
+            })?;
 
             new_user
         }

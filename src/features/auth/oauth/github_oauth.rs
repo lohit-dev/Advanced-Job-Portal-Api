@@ -1,8 +1,14 @@
 use crate::{
-    config::oauth::OAuthConfig, core::errors::OAuthError, features::auth::model::{GithubEmail, GithubUser},
+    config::oauth::OAuthConfig,
+    core::errors::OAuthError,
+    features::auth::model::{GithubEmail, GithubUser},
 };
 use oauth2::{
-    basic::{BasicClient, BasicErrorResponseType, BasicTokenType}, AccessToken, AuthorizationCode, Client, CsrfToken, EmptyExtraTokenFields, EndpointNotSet, EndpointSet, PkceCodeChallenge, PkceCodeVerifier, RevocationErrorResponseType, Scope, StandardErrorResponse, StandardRevocableToken, StandardTokenIntrospectionResponse, StandardTokenResponse, TokenResponse
+    AccessToken, AuthorizationCode, Client, CsrfToken, EmptyExtraTokenFields, EndpointNotSet,
+    EndpointSet, PkceCodeChallenge, PkceCodeVerifier, RevocationErrorResponseType, Scope,
+    StandardErrorResponse, StandardRevocableToken, StandardTokenIntrospectionResponse,
+    StandardTokenResponse, TokenResponse,
+    basic::{BasicClient, BasicErrorResponseType, BasicTokenType},
 };
 use reqwest::Client as HttpClient;
 
@@ -76,7 +82,10 @@ impl GithubOAuth {
         if user_info.email.is_none() {
             println!("Email is null, fetching from /user/emails endpoint");
 
-            match self.fetch_user_email(token.access_token().clone(), http_client).await {
+            match self
+                .fetch_user_email(token.access_token().clone(), http_client)
+                .await
+            {
                 Ok(Some(email)) => {
                     println!("Found email from /user/emails: {}", email);
                     user_info.email = Some(email);

@@ -1,5 +1,6 @@
 use crate::features::{
     auth::model::AuthProvider,
+    skills::model::Skill,
     users::model::{User, UserRole},
 };
 use chrono::{DateTime, Utc};
@@ -19,5 +20,12 @@ pub fn map_row_to_user(row: &PgRow) -> User {
         token_expires_at: row.get::<Option<DateTime<Utc>>, _>("token_expires_at"),
         role: row.get::<UserRole, _>("role"),
         provider: row.get::<AuthProvider, _>("provider"),
+    }
+}
+
+pub fn map_row_to_skill(row: &PgRow) -> Skill {
+    Skill {
+        id: row.get::<Uuid, _>("id"),
+        name: row.get::<String, _>("name"),
     }
 }

@@ -5,7 +5,7 @@ use e_commerce::{
     core::state::build_state,
     features::{
         auth::routes as auth_routes, mail::mails::get_base_template_path,
-        users::routes as user_routes,
+        users::routes as user_routes, skills::routes as skill_routes,
     },
 };
 use std::net::SocketAddr;
@@ -41,6 +41,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .nest("/api/", health_routes())
         .nest("/api/auth", auth_routes::routes())
         .nest("/api/users", user_routes::routes())
+        .nest("/api/skills", skill_routes::routes())
         .layer(CorsLayer::new().allow_origin(Any).allow_methods([
             Method::GET,
             Method::PUT,

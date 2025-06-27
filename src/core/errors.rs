@@ -35,6 +35,7 @@ pub enum ErrorMessage {
     TokenNotProvided,
     PermissionDenied,
     UserNotAuthenticated,
+    NotFound,
 }
 
 impl fmt::Display for ErrorResponse {
@@ -60,6 +61,7 @@ impl Display for ErrorMessage {
             ErrorMessage::TokenNotProvided => "Authorization token not provided",
             ErrorMessage::PermissionDenied => "You do not have permission to access this resource",
             ErrorMessage::UserNotAuthenticated => "User authentication required",
+            ErrorMessage::NotFound => "Not Found",
         };
         write!(f, "{msg}")
     }
@@ -70,6 +72,13 @@ impl HttpError {
         HttpError {
             message: message.into(),
             status,
+        }
+    }
+
+    pub fn not_found(message: impl Into<String>) -> Self {
+        HttpError {
+            message: message.into(),
+            status: StatusCode::NOT_FOUND,
         }
     }
 

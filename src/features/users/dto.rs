@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use validator::Validate;
 
 use crate::{
+    features::skills::dto::SkillResponseDto,
     features::users::model::{User, UserRole},
     utils::validation::validate_user_role,
 };
@@ -61,6 +62,7 @@ pub struct FilterUserDto {
     pub created_at: DateTime<Utc>,
     #[serde(rename = "updatedAt")]
     pub updated_at: DateTime<Utc>,
+    pub skills: Vec<SkillResponseDto>,
 }
 
 impl FilterUserDto {
@@ -73,10 +75,24 @@ impl FilterUserDto {
             role: user.role.to_str().to_string(),
             created_at: user.created_at.unwrap(),
             updated_at: user.updated_at.unwrap(),
+            skills: Vec::new(),
         }
     }
 
     pub fn filter_users(user: &[User]) -> Vec<FilterUserDto> {
         user.iter().map(FilterUserDto::filter_user).collect()
+    }
+
+    pub fn filter_user_with_skills(user: &User, skills: Vec<SkillResponseDto>) -> Self {
+        FilterUserDto {
+            id: user.id.to_string(),
+            name: user.name.to_owned(),
+            email: user.email.to_owned(),
+            verified: user.verified,
+            role: user.role.to_str().to_string(),
+            created_at: user.created_at.unwrap(),
+            updated_at: user.updated_at.unwrap(),
+            skills,
+        }
     }
 }

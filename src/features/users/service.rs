@@ -28,7 +28,7 @@ impl UserRepository for UserService {
 
         if let Some(user_id) = user_id {
             let row = sqlx::query(
-                "SELECT id, name, email, password, verified, created_at, updated_at, verification_token, token_expires_at, role, provider, skills FROM users WHERE id = $1"
+                "SELECT id, name, email, password, verified, created_at, updated_at, verification_token, token_expires_at, role, provider FROM users WHERE id = $1"
             )
             .bind(user_id)
             .fetch_optional(&self.db)
@@ -39,7 +39,7 @@ impl UserRepository for UserService {
             }
         } else if let Some(name) = name {
             let row = sqlx::query(
-                "SELECT id, name, email, password, verified, created_at, updated_at, verification_token, token_expires_at, role, provider, skills FROM users WHERE name = $1"
+                "SELECT id, name, email, password, verified, created_at, updated_at, verification_token, token_expires_at, role, provider FROM users WHERE name = $1"
             )
             .bind(name)
             .fetch_optional(&self.db)
@@ -50,7 +50,7 @@ impl UserRepository for UserService {
             }
         } else if let Some(email) = email {
             let row = sqlx::query(
-                "SELECT id, name, email, password, verified, created_at, updated_at, verification_token, token_expires_at, role, provider, skills FROM users WHERE email = $1"
+                "SELECT id, name, email, password, verified, created_at, updated_at, verification_token, token_expires_at, role, provider FROM users WHERE email = $1"
             )
             .bind(email)
             .fetch_optional(&self.db)
@@ -61,7 +61,7 @@ impl UserRepository for UserService {
             }
         } else if let Some(token) = token {
             let row = sqlx::query(
-                "SELECT id, name, email, password, verified, created_at, updated_at, verification_token, token_expires_at, role, provider, skills FROM users WHERE verification_token = $1"
+                "SELECT id, name, email, password, verified, created_at, updated_at, verification_token, token_expires_at, role, provider FROM users WHERE verification_token = $1"
             )
             .bind(token)
             .fetch_optional(&self.db)
@@ -78,7 +78,7 @@ impl UserRepository for UserService {
     async fn get_users(&self, page: u32, limit: usize) -> Result<Vec<User>, sqlx::Error> {
         let offset = (page - 1) * limit as u32;
         let rows = sqlx::query(
-            "SELECT id, name, email, password, verified, created_at, updated_at, verification_token, token_expires_at, role, provider, skills FROM users ORDER BY created_at DESC LIMIT $1 OFFSET $2"
+            "SELECT id, name, email, password, verified, created_at, updated_at, verification_token, token_expires_at, role, provider FROM users ORDER BY created_at DESC LIMIT $1 OFFSET $2"
         )
         .bind(limit as i64)
         .bind(offset as i64)

@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::{FromRow, Type};
 
-use crate::features::{auth::model::AuthProvider, skills::dto::SkillResponseDto};
+use crate::features::auth::model::AuthProvider;
 
 #[derive(Debug, Clone, PartialEq, Eq, sqlx::Type, serde::Serialize, serde::Deserialize)]
 #[sqlx(type_name = "user_role")]
@@ -58,7 +58,6 @@ pub struct User {
     pub token_expires_at: Option<DateTime<Utc>>,
     pub provider: AuthProvider,
     #[serde()]
-    pub skills: Option<Vec<SkillResponseDto>>,
     #[serde(rename = "createdAt")]
     pub created_at: Option<DateTime<Utc>>,
     #[serde(rename = "updatedAt")]

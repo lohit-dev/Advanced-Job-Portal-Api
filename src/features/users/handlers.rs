@@ -6,6 +6,8 @@ use crate::{
     },
     features::{
         auth::{repository::AuthRepository, service::AuthService},
+        skills::dto::SkillResponseDto,
+        skills::repository::SkillRepository,
         users::{
             dto::{FilterUserDto, NameUpdateDto, RegisterUserDto, RoleUpdateDto},
             repository::UserRepository,
@@ -45,9 +47,26 @@ pub async fn get_users(
         .await
         .map_err(|e| HttpError::server_error(e.to_string()))?;
 
+    let mut users_with_skills = Vec::new();
+    for user in &users {
+        let skills = app_state
+            .skill_service
+            .get_skills_of_user(user.id)
+            .await
+            .map_err(|e| HttpError::server_error(e.to_string()))?;
+        let skills_dto = skills
+            .into_iter()
+            .map(|s| SkillResponseDto {
+                id: s.id.to_string(),
+                name: s.name,
+            })
+            .collect();
+        users_with_skills.push(FilterUserDto::filter_user_with_skills(user, skills_dto));
+    }
+
     let response = UserListResponseDto {
         status: "success".to_string(),
-        users: FilterUserDto::filter_users(&users),
+        users: users_with_skills,
         results: user_count,
     };
 
@@ -65,10 +84,23 @@ pub async fn get_user(
         .map_err(|e| HttpError::server_error(e.to_string()))?
         .ok_or_else(|| HttpError::bad_request(ErrorMessage::UserNoLongerExist.to_string()))?;
 
+    let skills = app_state
+        .skill_service
+        .get_skills_of_user(user.id)
+        .await
+        .map_err(|e| HttpError::server_error(e.to_string()))?;
+    let skills_dto = skills
+        .into_iter()
+        .map(|s| SkillResponseDto {
+            id: s.id.to_string(),
+            name: s.name,
+        })
+        .collect();
+
     let response = UserResponseDto {
         status: "success".to_string(),
         data: UserData {
-            user: FilterUserDto::filter_user(&user),
+            user: FilterUserDto::filter_user_with_skills(&user, skills_dto),
         },
     };
 

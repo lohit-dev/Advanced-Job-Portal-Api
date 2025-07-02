@@ -3,7 +3,8 @@ use sqlx::PgPool;
 use crate::{
     config::{Config, database::init_db},
     features::{
-        auth::service::AuthService, skills::service::SkillService, users::service::UserService,
+        auth::service::AuthService, jobs::service::JobService, skills::service::SkillService,
+        users::service::UserService,
     },
 };
 
@@ -14,6 +15,7 @@ pub struct AppState {
     pub user_service: UserService,
     pub auth_service: AuthService,
     pub skill_service: SkillService,
+    pub job_service: JobService,
 }
 
 pub async fn build_state(config: Config) -> AppState {
@@ -21,12 +23,13 @@ pub async fn build_state(config: Config) -> AppState {
     let user_service = UserService { db: db.clone() };
     let auth_service = AuthService;
     let skill_service = SkillService { db: db.clone() };
-
+    let job_service: JobService = JobService { db: db.clone() };
     AppState {
         db,
         config,
         user_service,
         auth_service,
         skill_service,
+        job_service,
     }
 }

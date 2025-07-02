@@ -4,8 +4,9 @@ use e_commerce::{
     config::Config,
     core::state::build_state,
     features::{
-        auth::routes as auth_routes, mail::mails::get_base_template_path,
-        skills::routes as skill_routes, users::routes as user_routes,
+        auth::routes as auth_routes, jobs::routes as job_routes,
+        mail::mails::get_base_template_path, skills::routes as skill_routes,
+        users::routes as user_routes,
     },
 };
 use std::net::SocketAddr;
@@ -39,9 +40,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let app = Router::new()
         .nest("/api/", health_routes())
-        .nest("/api/auth", auth_routes::routes())
-        .nest("/api/users", user_routes::routes())
+        .nest("/api/jobs", job_routes::routes())
         .nest("/api/skills", skill_routes::routes())
+        .nest("/api/users", user_routes::routes())
+        .nest("/api/auth", auth_routes::routes())
         .layer(CorsLayer::new().allow_origin(Any).allow_methods([
             Method::GET,
             Method::PUT,

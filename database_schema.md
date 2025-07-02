@@ -21,6 +21,60 @@ CREATE TABLE users (
 );
 ```
 
+### Jobs Table (Updated)
+
+```sql
+CREATE TYPE job_type AS ENUM ('Remote', 'OnSite', 'Hybrid');
+
+CREATE TABLE jobs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    company VARCHAR(255) NOT NULL,
+    location VARCHAR(255) NOT NULL,
+    salary_min INTEGER,
+    salary_max INTEGER,
+    job_type job_type NOT NULL,
+    rounds INTEGER NOT NULL,
+    round_details JSONB,
+    experience_min INTEGER,
+    experience_max INTEGER,
+    is_remote BOOLEAN DEFAULT FALSE,
+    application_deadline DATE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+### Job Skills Table (Join Table)
+
+```sql
+CREATE TABLE job_skills (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    job_id UUID REFERENCES jobs(id) ON DELETE CASCADE,
+    skill_id UUID REFERENCES skills(id) ON DELETE CASCADE
+);
+```
+
+### Round Categories Table
+
+```sql
+CREATE TABLE round_categories (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(50) NOT NULL UNIQUE
+);
+
+-- Seed default round categories
+INSERT INTO round_categories (name) VALUES
+    ('Aptitude'),
+    ('Technical'),
+    ('HR'),
+    ('Managerial'),
+    ('GroupDiscussion'),
+    ('Coding'),
+    ('Other');
+```
+
 ## Entity Relationship Diagram (ERD)
 
 This diagram shows how all user-related data is linked. Fetching a user allows you to join and retrieve all their education, resumes, jobs applied for, and skills.
@@ -76,14 +130,17 @@ erDiagram
         uuid id PK
         varchar title
         text description
-        uuid company_id FK
+        varchar company
         varchar location
-        decimal salary_min
-        decimal salary_max
+        integer salary_min
+        integer salary_max
         enum job_type
-        date posted_at
-        date deadline
-        boolean is_active
+        integer rounds
+        jsonb round_details
+        integer experience_min
+        integer experience_max
+        boolean is_remote
+        date application_deadline
         timestamp created_at
         timestamp updated_at
     }
@@ -116,6 +173,11 @@ erDiagram
         uuid skill_id FK
     }
 
+    ROUND_CATEGORIES {
+        uuid id PK
+        varchar name
+    }
+
     USERS ||--o{ EDUCATION : "has"
     USERS ||--o{ RESUMES : "uploads"
     USERS ||--o{ APPLICATIONS : "applies"
@@ -131,6 +193,7 @@ erDiagram
     COMPANIES ||--o{ JOBS : "posts"
     SKILLS ||--o{ USER_SKILLS : "tagged"
     SKILLS ||--o{ JOB_SKILLS : "required"
+    JOBS ||--o{ ROUND_CATEGORIES : "uses"
 ```
 
 ## Table Relationships Explained
@@ -219,7 +282,7 @@ CREATE TYPE auth_provider AS ENUM ('Local', 'Google', 'Github');
 CREATE TYPE education_level AS ENUM ('Tenth', 'Twelfth', 'Diploma', 'BTech', 'MTech', 'PhD', 'Other');
 
 -- Job type
-CREATE TYPE job_type AS ENUM ('FullTime', 'PartTime', 'Internship', 'Contract', 'Remote', 'Temporary');
+CREATE TYPE job_type AS ENUM ('Remote', 'OnSite', 'Hybrid');
 
 -- Application status
 CREATE TYPE application_status AS ENUM ('Applied', 'Reviewed', 'Shortlisted', 'Interview', 'Offered', 'Rejected', 'Withdrawn');
@@ -302,24 +365,23 @@ CREATE INDEX companies_name_idx ON companies (name);
 
 ```sql
 CREATE TABLE jobs (
-    id UUID NOT NULL PRIMARY KEY DEFAULT (uuid_generate_v4()),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     title VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
-    company_id UUID REFERENCES companies(id) ON DELETE SET NULL,
-    location VARCHAR(255),
-    salary_min DECIMAL(10,2),
-    salary_max DECIMAL(10,2),
+    company VARCHAR(255) NOT NULL,
+    location VARCHAR(255) NOT NULL,
+    salary_min INTEGER,
+    salary_max INTEGER,
     job_type job_type NOT NULL,
-    posted_at DATE DEFAULT CURRENT_DATE,
-    deadline DATE,
-    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    rounds INTEGER NOT NULL,
+    round_details JSONB,
+    experience_min INTEGER,
+    experience_max INTEGER,
+    is_remote BOOLEAN DEFAULT FALSE,
+    application_deadline DATE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
-
-CREATE INDEX jobs_company_id_idx ON jobs (company_id);
-CREATE INDEX jobs_job_type_idx ON jobs (job_type);
-CREATE INDEX jobs_is_active_idx ON jobs (is_active);
 ```
 
 #### 6. Applications
@@ -368,12 +430,29 @@ CREATE UNIQUE INDEX user_skills_user_skill_idx ON user_skills (user_id, skill_id
 
 ```sql
 CREATE TABLE job_skills (
-    id UUID NOT NULL PRIMARY KEY DEFAULT (uuid_generate_v4()),
-    job_id UUID NOT NULL REFERENCES jobs(id) ON DELETE CASCADE,
-    skill_id UUID NOT NULL REFERENCES skills(id) ON DELETE CASCADE
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    job_id UUID REFERENCES jobs(id) ON DELETE CASCADE,
+    skill_id UUID REFERENCES skills(id) ON DELETE CASCADE
+);
+```
+
+#### 10. Round Categories
+
+```sql
+CREATE TABLE round_categories (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(50) NOT NULL UNIQUE
 );
 
-CREATE UNIQUE INDEX job_skills_job_skill_idx ON job_skills (job_id, skill_id);
+-- Seed default round categories
+INSERT INTO round_categories (name) VALUES
+    ('Aptitude'),
+    ('Technical'),
+    ('HR'),
+    ('Managerial'),
+    ('GroupDiscussion'),
+    ('Coding'),
+    ('Other');
 ```
 
 ## Implementation Priority

@@ -339,3 +339,136 @@
 - **Callback:** `/api/auth/google/callback`, `/api/auth/github/callback`
 - **Output:**
   JSON with token or redirect
+
+---
+
+## Jobs
+
+### Get Jobs
+
+- **Route:** `GET /api/jobs`
+- **Query Params:** `page` (optional), `limit` (optional)
+- **Input:** None
+- **Output:**
+
+```json
+[
+  {
+    "id": "uuid",
+    "title": "string",
+    "description": "string",
+    "company": "string",
+    "location": "string",
+    "salary_min": 0,
+    "salary_max": 0,
+    "job_type": "Remote|OnSite|Hybrid",
+    "rounds": 3,
+    "round_details": { "stages": ["uuid"], "description": "string" },
+    "experience_min": 0,
+    "experience_max": 0,
+    "is_remote": true,
+    "application_deadline": "date",
+    "created_at": "datetime",
+    "updated_at": "datetime"
+  }
+]
+```
+
+### Get Job by ID
+
+- **Route:** `GET /api/jobs/{job_id}`
+- **Params:** `job_id` (path)
+- **Output:** Same as above (single object)
+
+### Create Job
+
+- **Route:** `POST /api/jobs`
+- **Input:**
+
+```json
+{
+  "title": "string",
+  "description": "string",
+  "company": "string",
+  "location": "string",
+  "salary_min": 0,
+  "salary_max": 0,
+  "job_type": "Remote|OnSite|Hybrid",
+  "rounds": 3,
+  "round_details": { "stages": ["uuid"], "description": "string" },
+  "experience_min": 0,
+  "experience_max": 0,
+  "is_remote": true,
+  "application_deadline": "date",
+  "skills": ["uuid"]
+}
+```
+
+- **Output:** Same as Get Job by ID
+
+### Update Job
+
+- **Route:** `PUT /api/jobs/{job_id}`
+- **Input:** (any updatable field, plus optional `skills` array)
+- **Output:** Same as Get Job by ID
+
+### Delete Job
+
+- **Route:** `DELETE /api/jobs/{job_id}`
+- **Output:**
+
+```json
+{ "status": "success", "message": "Job deleted successfully" }
+```
+
+### Get Skills of Job
+
+- **Route:** `GET /api/jobs/{job_id}/skills`
+- **Output:**
+
+```json
+[{ "id": "uuid", "name": "string" }]
+```
+
+### Add Skills to Job
+
+- **Route:** `POST /api/jobs/{job_id}/skills`
+- **Input:**
+
+```json
+["uuid", "uuid"]
+```
+
+- **Output:**
+
+```json
+{ "status": "success", "message": "Skills added to job successfully" }
+```
+
+### Remove Skills from Job
+
+- **Route:** `DELETE /api/jobs/{job_id}/skills`
+- **Input:**
+
+```json
+["uuid", "uuid"]
+```
+
+- **Output:**
+
+```json
+{ "status": "success", "message": "Skills removed from job successfully" }
+```
+
+### Get Jobs of Skill
+
+- **Route:** `GET /api/jobs/skills/{skill_id}`
+- **Output:** Array of job objects (same as Get Jobs)
+
+---
+
+### Notes
+
+- Jobs and skills are linked via the `job_skills` join table (many-to-many).
+- Interview rounds are described by `round_details` (JSONB), with stages referencing `round_categories` (UUIDs).
+- See the database schema for more details on table structure.
